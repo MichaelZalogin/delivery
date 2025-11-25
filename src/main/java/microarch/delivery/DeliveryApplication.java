@@ -1,4 +1,4 @@
-package org.example.delivery;
+package microarch.delivery;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
