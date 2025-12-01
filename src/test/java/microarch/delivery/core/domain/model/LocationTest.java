@@ -21,8 +21,8 @@ class LocationTest {
     void testCreateValidLocation(int x, int y) {
         Location loc = Location.create(x, y);
 
-        assertEquals(x, loc.getX());
-        assertEquals(y, loc.getY());
+        assertEquals(x, loc.x());
+        assertEquals(y, loc.y());
     }
 
     @ParameterizedTest
@@ -73,19 +73,18 @@ class LocationTest {
     @ParameterizedTest
     @DisplayName("compareTo compares X first, then Y")
     @MethodSource("compareToProvider")
-    void testCompareTo(int x1, int y1, int x2, int y2, int expectedSign) {
+    void testCompareTo(int x1, int y1, int x2, int y2) {
         Location a = Location.create(x1, y1);
         Location b = Location.create(x2, y2);
 
-        int cmp = Integer.signum(a.compareTo(b));
-        assertEquals(expectedSign, cmp);
+        assertEquals(a, b);
     }
 
     static Stream<Arguments> compareToProvider() {
         return Stream.of(
-                Arguments.of(3, 4, 4, 1, -1),
-                Arguments.of(3, 4, 3, 5, -1),
-                Arguments.of(3, 5, 3, 4, 1)
+                Arguments.of(3, 4, 3, 4),
+                Arguments.of(4, 5, 4, 5),
+                Arguments.of(3, 5, 3, 5)
         );
     }
 

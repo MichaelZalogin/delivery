@@ -1,4 +1,4 @@
-package errs;
+package libs.errs;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
