@@ -1,7 +1,9 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.5.7'
-    id 'io.spring.dependency-management' version '1.1.7'
+    id 'org.springframework.boot' version '3.5.5'
+    id 'io.spring.dependency-management' version '1.1.6'
+    id 'org.flywaydb.flyway' version '9.5.1'
+    id 'org.openapi.generator' version '6.2.0'
 }
 
 group = 'org.microarch'
@@ -24,16 +26,85 @@ repositories {
     mavenCentral()
 }
 
+ext {
+    set('springModulithVersion', '1.3.3')
+    set('jmoleculesVersion', '2023.2.1')
+}
+
 dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.springframework.kafka:spring-kafka'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+
+    // SPRING MODULITH
+    implementation 'org.springframework.modulith:spring-modulith-starter-core'
+    implementation 'org.springframework.modulith:spring-modulith-events-api'
+    implementation 'org.springframework.modulith:spring-modulith-events-jdbc'
+    implementation 'org.springframework.modulith:spring-modulith-events-jackson'
+
+    // DB SCHEDULER
+    implementation 'com.github.kagkarlsson:db-scheduler-spring-boot-starter:15.6.0'
+    implementation 'io.rocketbase.extension:db-scheduler-log-spring-boot-starter:0.7.0'
+
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+    runtimeOnly 'org.postgresql:postgresql'
     compileOnly 'cc.jilt:jilt:1.8.2'
     annotationProcessor 'cc.jilt:jilt:1.8.4'
-    runtimeOnly 'org.postgresql:postgresql'
-    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.kafka:spring-kafka-test'
+    implementation 'org.jmolecules:jmolecules-ddd'
+    implementation 'org.jmolecules:jmolecules-onion-architecture'
+    implementation 'io.hypersistence:tsid:1.1.0'
+
+    // OPENAPI / SWAGGER
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0'
+    implementation 'org.openapitools:jackson-databind-nullable:0.2.8'
+    implementation 'jakarta.validation:jakarta.validation-api:3.1.1'
+    implementation 'io.swagger.core.v3:swagger-annotations:2.2.40'
+
+    // TEST
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.modulith:spring-modulith-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'org.instancio:instancio-junit:5.5.1'
+    testImplementation 'com.tngtech.archunit:archunit-junit5:1.4.1'
+    testImplementation 'org.jmolecules.integrations:jmolecules-archunit'
+    testImplementation 'org.wiremock.integrations:wiremock-spring-boot:3.10.6'
+
+    dependencyManagement {
+        imports {
+            mavenBom 'org.springframework.modulith:spring-modulith-bom:1.3.3'
+            mavenBom 'org.jmolecules:jmolecules-bom:2023.2.1'
+            mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2025.0.0'
+        }
+    }
+
+    // OpenAPI Generator
+    openApiGenerate {
+        generatorName = "spring"
+        inputSpec = "$projectDir/src/main/resources/static/openapi.yaml".toString()
+        outputDir = "$buildDir/generated-sources/openapi".toString()
+        apiPackage = "microarch.delivery.openapi"
+        modelPackage = "microarch.delivery.openapi.dto"
+        modelNameSuffix = "Dto"
+        configOptions = [
+                useSpringBoot3: "true",
+                interfaceOnly: "true",
+                skipDefaultInterface: "false",
+                useTags: "true",
+                unhandledException: "true"
+        ]
+        additionalProperties = [
+                "removeEnumValuePrefix": "false"
+        ]
+    }
 }
 
 test {

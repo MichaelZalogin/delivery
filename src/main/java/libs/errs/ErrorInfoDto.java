@@ -1,4 +1,4 @@
-package errs;
+package libs.errs;
 
 import org.jilt.Builder;
 
