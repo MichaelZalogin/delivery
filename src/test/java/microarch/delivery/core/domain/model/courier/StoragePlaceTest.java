@@ -89,7 +89,7 @@ class StoragePlaceTest {
         Id order = Id.generate();
         StoragePlace place = StoragePlace.create(StoragePlaceType.TRUNK);
         place.putOrder(order, 15);
-        Id removed = place.removeOrder();
+        Id removed = place.clear();
 
         assertEquals(order, removed);
         assertTrue(place.isEmpty());
@@ -99,7 +99,7 @@ class StoragePlaceTest {
     void removeOrder_fromEmptyPlaceReturnsNull() {
         StoragePlace place = StoragePlace.create(StoragePlaceType.TRUNK);
 
-        Id removed = place.removeOrder();
+        Id removed = place.clear();
 
         assertNull(removed);
         assertTrue(place.isEmpty());
