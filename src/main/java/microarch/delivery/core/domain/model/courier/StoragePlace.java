@@ -45,7 +45,7 @@ public class StoragePlace {
         this.orderId = orderId;
     }
 
-    public Id removeOrder() {
+    public Id clear() {
         Id removed = orderId;
         this.orderId = null;
         return removed;
