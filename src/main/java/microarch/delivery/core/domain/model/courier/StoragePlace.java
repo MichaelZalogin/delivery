@@ -26,8 +26,8 @@ public class StoragePlace {
         this.orderId = orderId;
     }
 
-    public static StoragePlace create(StoragePlaceType type, Id orderId) {
-        return new StoragePlace(Id.generate(), type, orderId);
+    public static StoragePlace create(StoragePlaceType type) {
+        return new StoragePlace(Id.generate(), type, null);
     }
 
     public boolean isEmpty() {
