@@ -1,4 +1,4 @@
-package ddd;
+package libs.ddd;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
