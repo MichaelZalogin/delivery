@@ -128,8 +128,6 @@ public class CourierTest {
 
         courier.takeOrder(order);
 
-        assertEquals(courier.getId(), order.getCourierId());
-
         StoragePlace place = courier.getStoragePlaces().get(0);
         assertEquals(order.getId(), place.getOrderId());
     }
@@ -137,11 +135,22 @@ public class CourierTest {
     @Test
     void shouldCompleteOrder() {
         Order order = Order.create(Id.generate(), start, 2);
+        order.assign(courier.getId());
         courier.takeOrder(order);
 
         courier.completeOrder(order);
 
-        assertEquals(OrderStatus.COMPLETED, order.getStatus());
+        StoragePlace place = courier.getStoragePlaces().get(0);
+        assertNull(place.getOrderId());
+    }
+
+    @Test
+    void shouldTerminateOrder() {
+        Order order = Order.create(Id.generate(), start, 2);
+        order.assign(courier.getId());
+        courier.takeOrder(order);
+
+        courier.terminateOrder(order);
 
         StoragePlace place = courier.getStoragePlaces().get(0);
         assertNull(place.getOrderId());
@@ -150,8 +159,8 @@ public class CourierTest {
     @Test
     void shouldNotCompleteOrder_when_WrongCourier() {
         Order order = Order.create(Id.generate(), start, 2);
-
         Courier other = Courier.create("Other", 3, start);
+
         other.takeOrder(order);
 
         assertThrows(IllegalArgumentException.class, () -> courier.completeOrder(order));

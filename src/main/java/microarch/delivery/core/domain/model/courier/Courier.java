@@ -8,6 +8,7 @@ import org.springframework.util.Assert;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import static microarch.delivery.core.domain.model.courier.StoragePlaceType.BACKPACK;
 
@@ -49,7 +50,6 @@ public class Courier extends Aggregate<Id> {
     public Courier takeOrder(Order order) {
         Assert.notNull(order, "order must be not null");
         Assert.isTrue(canTakeOrder(order), "Courier cannot take this order. No storage capacity");
-        order.assign(getId());
 
         StoragePlace bestPlace = storagePlaces.stream()
                 .filter(place -> place.canPut(order.getVolume()))
@@ -62,12 +62,14 @@ public class Courier extends Aggregate<Id> {
 
     public void completeOrder(Order order) {
         Assert.notNull(order, "order must be not null");
-        Assert.isTrue(getId().equals(order.getCourierId()), "Courier cannot complete order assigned to another courier");
-        order.complete();
-        storagePlaces.stream()
-                .filter(place -> order.getId().equals(place.getOrderId()))
-                .findFirst()
-                .ifPresent(StoragePlace::clear);
+        Assert.isTrue(this.id == order.getCourierId(), "Courier cannot complete order assigned to another courier");
+        findStorageByOrderId(order.getId()).ifPresent(StoragePlace::clear);
+    }
+
+    public void terminateOrder(Order order) {
+        Assert.notNull(order, "order must be not null");
+        Assert.isTrue(this.id == order.getCourierId(), "Courier cannot terminate order assigned to another courier");
+        findStorageByOrderId(order.getId()).ifPresent(StoragePlace::clear);
     }
 
     public double calculateDeliveryTime(Location targetLocation) {
@@ -101,6 +103,12 @@ public class Courier extends Aggregate<Id> {
         }
 
         this.location = Location.create(location.x() + stepX, location.y() + stepY);
+    }
+
+    private Optional<StoragePlace> findStorageByOrderId(Id orderId) {
+        return storagePlaces.stream()
+                .filter(storagePlace -> storagePlace.getOrderId() == orderId)
+                .findFirst();
     }
 
     public String getName() {
